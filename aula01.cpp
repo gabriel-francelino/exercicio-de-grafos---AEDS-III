@@ -2,11 +2,11 @@
 #include <fstream>
 #include <iostream>
 #include <cmath>
+#include <math.h>
 
 using namespace std;
 
-int nLinhas = 0, i=0;
-//int *x, *y;
+int nLinhas = 0, i=0, j=0;
 
 int leGrafo(const char *name){
     ifstream myfile(name);
@@ -22,7 +22,7 @@ int leGrafo(const char *name){
         }
         myfile.close();
     } else{
-        cout << "Não foi possível ler o arquivo." << endl;
+        cout << "NÃ£o foi possÃ­vel ler o arquivo." << endl;
     }
         
     return 0;
@@ -45,70 +45,77 @@ int coordenadas(const char *name){
         }
         myfile.close();
     } else{
-        cout << "Não foi possível ler o arquivo." << endl;
+        cout << "NÃ£o foi possÃ­vel ler o arquivo." << endl;
     }
         
     return 0;
 }
 
-int distEuclid(){
-    int dist;
-
-    for ( i = 0; i < nLinhas/2; i++)
-    {
-        dist = sqrt((x[i+1]-x[i])^2 + (y[i+1]-y[i])^2 );
-    }
-    
-    return dist;
+int peso(int *x, int *y, int i, int j){
+    int p,a,b;
+    a=x[j]-x[i];
+    b=y[j]-y[i];
+    p = sqrt(pow(a,2) + pow(b,2));
+    return p;
 }
 
 void imprime(){
     for (int i = 0; i < nLinhas; i++)
     {
-        cout << x[i] << endl;
+        cout << "x: " << x[i] << "\ty: " << y[i] << endl;
+    }
+}
+
+void imprimeMatriz(int **m){
+    for ( i = 0; i < nLinhas; i++)
+    {
+        for ( j = 0; j < nLinhas; j++)
+        {
+            cout << "["<< m[i][j] << "]\t";
+        }
+        cout << endl;
     }
 }
 
 int **matrizAloc(){
     int **mat;
-    mat = (int **) malloc (nLinhas * sizeof (int**)) ;
+    mat = (int **) malloc (nLinhas * sizeof (int*)) ;
     for (i=0; i < nLinhas; i++){
-        mat[i] = (int *) malloc (nLinhas * sizeof (int*)) ;
+        mat[i] = (int *) malloc (nLinhas * sizeof (int)) ;
     }
 
    for (int lin = 0; lin < nLinhas; lin++)
    {
        for (int col = 0; col < nLinhas; col++)
        {
-           mat[lin][col] = 0;
+           if (lin == col)
+           {
+               mat[lin][col] = 0;
+           }else{
+               mat[lin][col] = peso(x, y, lin, col);
+           }
        }
        
    }
     return mat;
 }
 
+void freeMatriz(int **m){
+    for(i=0; i<nLinhas; i++){
+        free(m[i]);
+    }
+    free(m);
+}
+
 
 int main(int argc, char**argv){
 
-    leGrafo("teste.txt");
-    coordenadas("teste.txt");
-    imprime();
-
+    leGrafo("aula3aeds.txt");
+    coordenadas("aula3aeds.txt");
+    //imprime();
     int **m = matrizAloc();
-
-    for ( i = 0; i < nLinhas; i++)
-    {
-        for (int j = 0; j < nLinhas; j++)
-        {
-            cout << m[i][j] << " - ";
-        }
-        cout << endl;
-    }
-    
-
-    float distEuc = distEuclid();
-
-    cout << "numero de linhas: " << nLinhas << endl;
+    imprimeMatriz(m);
+    freeMatriz(m);
 
     return 0;
 }
