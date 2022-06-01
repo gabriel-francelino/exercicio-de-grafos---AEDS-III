@@ -5,43 +5,102 @@
 #include <cmath>
 #include <math.h>
 
+#define true 1
+#define false 0
+
 using namespace std;
 
 int nLinhas = 0, i = 0, j = 0;
 
 //----------------------------------------------------------------------------------------------------------
-typedef struct grafo Grafo;
+typedef int TIPOPESO;
 
-struct grafo {
-    int numVertices;
-    int** pesos;
-};
+typedef struct adjacencia {
+    int vertice;    //vertice de destino
+    TIPOPESO peso;  //peso associado a aresta que leva ao vertice de destino
+    struct adjacencia *prox;    //prox elemento da lista de adjacencia
+}ADJACENCIA;
 
-Grafo* iniciaGrafo(int numVertices) {
-    Grafo *gr = (Grafo*) malloc(sizeof (struct grafo));
-    if (gr != NULL) {
-        gr->numVertices = numVertices;
-        for (i = 0; i < numVertices; i++) {
-            gr->pesos = (int**) malloc(numVertices * sizeof (int*));
-            for (j = 0; j < numVertices; j++) {
-                gr->pesos[j] = (int*) malloc(numVertices * sizeof (int));
-            }
-        }
+/**
+ * @brief Dados armazenados vão aqui
+ * 
+ */
+typedef struct vertice{
+    ADJACENCIA *cab;    //possui apenas a cabeça de adjacencia
+}VERTICE;
+
+typedef struct grafo{
+    int vertices;   //num de vertices total
+    int arestas;    //num de arestas totais
+    VERTICE *adj;   //arranjo de vertices da estrutura
+}GRAFO;
+
+/**
+ * @brief função para criar um GRAFO
+ * 
+ * @param v num de vértices
+ * @return GRAFO* 
+ */
+GRAFO *criaGrafo(int v){
+    GRAFO *g = (GRAFO*)malloc(sizeof(GRAFO));
+    g->vertices = v;
+    g->arestas = 0;
+    g->adj = (VERTICE*)malloc(v*sizeof(VERTICE));
+
+    for ( i = 0; i < v; i++)
+    {
+        g->adj[i].cab=NULL;
     }
-    return gr;
+    return g;
 }
 
-void liberaGrafo(Grafo* gr){
-    if(gr != NULL){
-        for(i=0; i<gr->numVertices; i++){
-            free(gr->pesos[i]);
-        }
-        free(gr->pesos);
-        free(gr);
-    }
+/**
+ * @brief função para adicionar arestas no GRAFO
+ * 
+ * @param v vértice alvo da adjacencia
+ * @param peso peso da aresta
+ * @return ADJACENCIA* 
+ */
+ADJACENCIA *criaAdj(int v, int peso){
+    ADJACENCIA *temp = (ADJACENCIA*)malloc(sizeof(ADJACENCIA));
+    temp->vertice = v;
+    temp->peso = peso;
+    temp->prox = NULL;
+    return temp;
 }
+
+
+bool criaAresta(GRAFO *gr, int vi, int vf, TIPOPESO p) { //vai de vi a vf
+	if(!gr) return (false);  //validações se o grafo existe 
+	
+	ADJACENCIA *novo = criaAdj(vf,p); //crio adjacencia com o vértice final e o peso
+	//coloco a adjacencia na lista do vértice inicial
+	novo->prox = gr->adj[vi].cab; //o campo prox da adjacencia vai receber a cabeça da lista
+	gr->adj[vi].cab=novo; // e a cabeça da lista passa a ser o novo elemento
+	gr->arestas++; // atualizo o numero de aresta no grafo
+	return (true);
+}
+
+void imprimeLista(GRAFO *gr){
+    cout << "Vertices: " << gr->vertices << "\tArestas: " << gr->arestas << endl;
+
+    for ( i = 0; i < gr->vertices; i++)
+    {
+        cout << "v" << i << ":";
+        ADJACENCIA *ad = gr->adj[i].cab;
+        while (ad)
+        {
+            cout << "v" << ad->vertice << "(" << ad->peso << ")";
+            ad=ad->prox;
+        }
+        cout << endl;
+    }
+    
+    
+}
+
 //-----------------------------------------------------------------------------------
-int leGrafo(const char *name) {
+void leGrafo(const char *name) {
     ifstream myfile(name);
     if (myfile.is_open()) {
         while (!myfile.eof()) {
@@ -57,8 +116,6 @@ int leGrafo(const char *name) {
     } else {
         cout << "NÃ£o foi possÃ­vel ler o arquivo." << endl;
     }
-
-    return 0;
 }
 
 int *x = (int *) malloc(nLinhas * sizeof (int));
@@ -133,14 +190,24 @@ void freeMatriz(int **m) {
     }
     free(m);
 }
-
+//--------------------------------------------------------------------------------------
 int main(int argc, char**argv) {
-
     leGrafo("teste.txt");
     coordenadas("teste.txt");
-    //imprime();
+
     int **m = matrizAloc();
-    imprimeMatriz(m);
+    GRAFO *gr = criaGrafo(nLinhas);
+
+    for ( i = 0; i < nLinhas; i++)
+    {
+        for ( j = 0; j < nLinhas; j++)
+        {
+            criaAresta(gr, x[i], y[j], m[i][j]);
+        }   
+    }
+    
+    imprimeLista(gr);
+    //imprimeMatriz(m);
     freeMatriz(m);
 
     return 0;
