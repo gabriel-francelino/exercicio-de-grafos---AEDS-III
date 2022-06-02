@@ -22,6 +22,7 @@ typedef struct adjacencia {
     int vertice; //vertice de destino
     TIPOPESO peso; //peso associado a aresta que leva ao vertice de destino
     struct adjacencia *prox; //prox elemento da lista de adjacencia
+    int ind;    //indicativo para a busca (branco=-1, cinza=0, preto=1)
 } ADJACENCIA;
 
 /**
@@ -68,6 +69,7 @@ ADJACENCIA *criaAdj(int v, int peso) {
     temp->vertice = v;
     temp->peso = peso;
     temp->prox = NULL;
+    temp->ind = 0;
     return temp;
 }
 
@@ -198,8 +200,45 @@ void freeMatriz(int **m) {
     free(m);
 }
 //------------------------------------------------BUSCA EM LARGURA---------------------------------------------------------------
+/*
+https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/bfs.html
+https://www.pucsp.br/~jarakaki/grafos/Aula6.pdf
 
+void GRAPHbfs( Graph G, vertex s) 
+{ 
+   int cnt = 0;
+   for (vertex v = 0; v < G->V; ++v)
+      num[v] = -1;
+   QUEUEinit( G->V);
+   num[s] = cnt++; 
+   QUEUEput( s); 
 
+   while (!QUEUEempty( )) {
+      vertex v = QUEUEget( ); 
+      for (link a = G->adj[v]; a != NULL; a = a->next)
+         if (num[a->w] == -1) {
+            num[a->w] = cnt++; 
+            QUEUEput( a->w); 
+         }
+   }
+   QUEUEfree( ); 
+}
+*/
+
+void buscaBFS(GRAFO g, int raiz){
+    int cont = 0;
+    ADJACENCIA *u = g.adj->cab;
+    for ( i = 0; i < g.vertices; i++)
+    {
+        while (u->vertice != raiz)
+        {
+            u = u->prox;     
+        }    
+        u->ind = -1;
+    }
+    //QUEUEinit(g.vertices);
+    
+}
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
