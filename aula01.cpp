@@ -11,8 +11,11 @@
 using namespace std;
 
 int nLinhas = 0, i = 0, j = 0;
+int *x; 
+int *y;
 
-//----------------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------LISTA DE ADJACENCIA--------------------------------------------------------
 typedef int TIPOPESO;
 
 typedef struct adjacencia {
@@ -94,7 +97,15 @@ void imprimeLista(GRAFO *gr) {
     cout << "----------------------------------------------" << endl;
 }
 
-//-----------------------------------------------------------------------------------
+void freeLista(GRAFO *g) {
+    for(int i = 0; i < g->vertices; i++) {
+        free(g->adj[i].cab);
+    }
+    free(g->adj);
+    free(g);
+}
+
+//--------------------------------------------------MATRIZ DE ADJACENCIA-------------------------------------------------------
 
 void leGrafo(const char *name) {
     ifstream myfile(name);
@@ -109,17 +120,15 @@ void leGrafo(const char *name) {
             nLinhas++;
         }
         myfile.close();
-    } else {
-        cout << "NÃ£o foi possÃ­vel ler o arquivo." << endl;
+        x = (int *) malloc((nLinhas) * sizeof (int));
+        y = (int *) malloc((nLinhas) * sizeof (int));
     }
 }
-
-int *x = (int *) malloc(nLinhas * sizeof (int));
-int *y = (int *) malloc(nLinhas * sizeof (int));
 
 int coordenadas(const char *name) {
     ifstream myfile(name);
     if (myfile.is_open()) {
+        i=0;
         while (!myfile.eof()) {
 
             int a;
@@ -188,7 +197,11 @@ void freeMatriz(int **m) {
     }
     free(m);
 }
-//--------------------------------------------------------------------------------------
+//------------------------------------------------BUSCA EM LARGURA---------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char**argv) {
     leGrafo("teste.txt");
@@ -207,6 +220,7 @@ int main(int argc, char**argv) {
 
     imprimeLista(gr);
     imprimeMatriz(m);
+    freeLista(gr);
     freeMatriz(m);
 
     return 0;
