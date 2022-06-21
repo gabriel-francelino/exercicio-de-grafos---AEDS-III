@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <fstream>
 #include <iostream>
-#include <cmath>
 #include <math.h>
 
-#define true 1
-#define false 0
+
+
 
 using namespace std;
 
@@ -18,6 +17,10 @@ int *y;
 //--------------------------------------------------LISTA DE ADJACENCIA--------------------------------------------------------
 typedef int TIPOPESO;
 
+/**
+ * @brief estrutura para a lista de adjacencia.
+ * 
+ */
 typedef struct adjacencia {
     int vertice; //vertice de destino
     TIPOPESO peso; //peso associado a aresta que leva ao vertice de destino
@@ -31,6 +34,7 @@ typedef struct adjacencia {
  */
 typedef struct vertice {
     ADJACENCIA *cab; //possui apenas a cabeça de adjacencia
+    
 } VERTICE;
 
 typedef struct grafo {
@@ -107,6 +111,15 @@ void freeLista(GRAFO *g) {
     free(g);
 }
 
+void criaListAdj(GRAFO *gr, int** m){
+    for (i = 0; i < nLinhas; i++) {
+        for (j = 0; j < nLinhas; j++) {
+            if (i != j) {
+                criaAresta(gr, i, j, m[i][j]);
+            }
+        }
+    }
+}
 //--------------------------------------------------MATRIZ DE ADJACENCIA-------------------------------------------------------
 
 void leGrafo(const char *name) {
@@ -156,12 +169,6 @@ int peso(int *x, int *y, int i, int j) {
     return p;
 }
 
-void imprime() {
-    for (int i = 0; i < nLinhas; i++) {
-        cout << "x: " << x[i] << "\ty: " << y[i] << endl;
-    }
-}
-
 void imprimeMatriz(int **m) {
     cout << "-------------------------MATRIZ DE ADJACENCIA----------------------" << endl;
     for (i = 0; i < nLinhas; i++) {
@@ -199,46 +206,16 @@ void freeMatriz(int **m) {
     }
     free(m);
 }
-//------------------------------------------------BUSCA EM LARGURA---------------------------------------------------------------
-/*
-https://www.ime.usp.br/~pf/algoritmos_para_grafos/aulas/bfs.html
-https://www.pucsp.br/~jarakaki/grafos/Aula6.pdf
 
-void GRAPHbfs( Graph G, vertex s) 
-{ 
-   int cnt = 0;
-   for (vertex v = 0; v < G->V; ++v)
-      num[v] = -1;
-   QUEUEinit( G->V);
-   num[s] = cnt++; 
-   QUEUEput( s); 
-
-   while (!QUEUEempty( )) {
-      vertex v = QUEUEget( ); 
-      for (link a = G->adj[v]; a != NULL; a = a->next)
-         if (num[a->w] == -1) {
-            num[a->w] = cnt++; 
-            QUEUEput( a->w); 
-         }
-   }
-   QUEUEfree( ); 
-}
-*/
-
-void buscaBFS(GRAFO g, int raiz){
-    int cont = 0;
-    ADJACENCIA *u = g.adj->cab;
-    for ( i = 0; i < g.vertices; i++)
+//--------------------------------------------------BUSCA EM LARGURA-------------------------------------------------------
+int buscaBFS(GRAFO *gr, VERTICE *v){
+    for ( i = 0; i<nLinhas; i++)
     {
-        while (u->vertice != raiz)
-        {
-            u = u->prox;     
-        }    
-        u->ind = -1;
+        
     }
-    //QUEUEinit(g.vertices);
     
 }
+
 
 //-------------------------------------------------------------------------------------------------------------------------------
 
@@ -249,14 +226,7 @@ int main(int argc, char**argv) {
     int **m = matrizAloc();
     GRAFO *gr = criaGrafo(nLinhas);
 
-    for (i = 0; i < nLinhas; i++) {
-        for (j = 0; j < nLinhas; j++) {
-            if (i != j) {
-                criaAresta(gr, i, j, m[i][j]);
-            }
-        }
-    }
-
+    criaListAdj(gr, m);
     imprimeLista(gr);
     imprimeMatriz(m);
     freeLista(gr);
