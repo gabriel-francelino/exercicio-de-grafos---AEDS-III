@@ -1,11 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <fstream>
 #include <iostream>
 #include <math.h>
 
 
-
+#define infinito 10000000
 
 using namespace std;
 
@@ -25,7 +23,6 @@ typedef struct adjacencia {
     int vertice; //vertice de destino
     TIPOPESO peso; //peso associado a aresta que leva ao vertice de destino
     struct adjacencia *prox; //prox elemento da lista de adjacencia
-    int ind;    //indicativo para a busca (branco=-1, cinza=0, preto=1)
 } ADJACENCIA;
 
 /**
@@ -34,6 +31,9 @@ typedef struct adjacencia {
  */
 typedef struct vertice {
     ADJACENCIA *cab; //possui apenas a cabeça de adjacencia
+    int ind;    //indicativo para a busca (branco=-1, cinza=0, preto=1)
+    int d;      //distancia do vertice
+
     
 } VERTICE;
 
@@ -73,7 +73,6 @@ ADJACENCIA *criaAdj(int v, int peso) {
     temp->vertice = v;
     temp->peso = peso;
     temp->prox = NULL;
-    temp->ind = 0;
     return temp;
 }
 
@@ -135,8 +134,8 @@ void leGrafo(const char *name) {
             nLinhas++;
         }
         myfile.close();
-        x = (int *) malloc((nLinhas) * sizeof (int));
-        y = (int *) malloc((nLinhas) * sizeof (int));
+        x = new int[nLinhas];
+        y = new int[nLinhas];
     }
 }
 
@@ -182,9 +181,9 @@ void imprimeMatriz(int **m) {
 
 int **matrizAloc() {
     int **mat;
-    mat = (int **) malloc(nLinhas * sizeof (int*));
+    mat = new int*[nLinhas];
     for (i = 0; i < nLinhas; i++) {
-        mat[i] = (int *) malloc(nLinhas * sizeof (int));
+        mat[i] = new int[nLinhas];
     }
 
     for (int lin = 0; lin < nLinhas; lin++) {
@@ -202,19 +201,19 @@ int **matrizAloc() {
 
 void freeMatriz(int **m) {
     for (i = 0; i < nLinhas; i++) {
-        free(m[i]);
+        delete(m[i]);
     }
-    free(m);
+    delete(m);
 }
 
-//--------------------------------------------------BUSCA EM LARGURA-------------------------------------------------------
-int buscaBFS(GRAFO *gr, VERTICE *v){
-    for ( i = 0; i<nLinhas; i++)
-    {
-        
-    }
+//--------------------------------------------------DIJKSTRA-------------------------------------------------------
+// GRAFO* inicializaDijkstra(GRAFO* g, VERTICE* v){
+//     //int *d = new int[nLinhas];
+//     for(int i=0; i< nLinhas; i++){
+//         g->vertices
+//     }
     
-}
+// }
 
 
 //-------------------------------------------------------------------------------------------------------------------------------
