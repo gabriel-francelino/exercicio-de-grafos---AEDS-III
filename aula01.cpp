@@ -38,10 +38,17 @@ typedef struct vertice {
 } VERTICE;
 
 typedef struct grafo {
-    int vertices; //num de vertices total
-    int arestas; //num de arestas totais
+    int nVertices; //num de vertices total
+    int nArestas; //num de arestas totais
     VERTICE *adj; //arranjo de vertices da estrutura
 } GRAFO;
+
+//teste-----------------------------------------
+typedef struct aresta
+{
+    int v1, v2;     //vertices da aresta
+    int peso;       //peso da aresta
+}ARESTA;
 
 /**
  * @brief função para criar um GRAFO
@@ -50,10 +57,10 @@ typedef struct grafo {
  * @return GRAFO* 
  */
 GRAFO *criaGrafo(int v) {
-    GRAFO *g = (GRAFO*) malloc(sizeof (GRAFO));
-    g->vertices = v;
-    g->arestas = 0;
-    g->adj = (VERTICE*) malloc(v * sizeof (VERTICE));
+    GRAFO *g = new GRAFO;
+    g->nVertices = v;
+    g->nArestas = 0;
+    g->adj = new VERTICE[v];
 
     for (i = 0; i < v; i++) {
         g->adj[i].cab = NULL;
@@ -76,21 +83,27 @@ ADJACENCIA *criaAdj(int v, int peso) {
     return temp;
 }
 
-bool criaAresta(GRAFO *gr, int vi, int vf, TIPOPESO p) { //vai de vi a vf
-    if (!gr) return (false); //validações se o grafo existe 
+void criaAresta(GRAFO *gr, int vi, int vf, TIPOPESO p) { //vai de vi a vf
+    //if (!gr) return (false); //validações se o grafo existe 
 
-    ADJACENCIA *novo = criaAdj(vf, p); //crio adjacencia com o vértice final e o peso
+    //crio adjacencia com o vértice final e o peso
+    ADJACENCIA *novo = criaAdj(vf, p); 
+
     //coloco a adjacencia na lista do vértice inicial
-    novo->prox = gr->adj[vi].cab; //o campo prox da adjacencia vai receber a cabeça da lista
-    gr->adj[vi].cab = novo; // e a cabeça da lista passa a ser o novo elemento
-    gr->arestas++; // atualizo o numero de aresta no grafo
-    return (true);
+    //o campo prox da adjacencia vai receber a cabeça da lista
+    novo->prox = gr->adj[vi].cab; 
+    // e a cabeça da lista passa a ser o novo elemento
+    gr->adj[vi].cab = novo; 
+    // atualizo o numero de aresta no grafo
+    gr->nArestas++; 
+    
+    //return (true);
 }
 
 void imprimeLista(GRAFO *gr) {
     cout << "---------------LISTA DE ADJACENCIA-------------" << endl;
-    cout << "Vertices: " << gr->vertices << "\tArestas: " << gr->arestas << endl;
-    for (i = 0; i < gr->vertices; i++) {
+    cout << "Vertices: " << gr->nVertices << "\tArestas: " << gr->nArestas << endl;
+    for (i = 0; i < gr->nVertices; i++) {
         cout << "v" << i << ": ";
         ADJACENCIA *ad = gr->adj[i].cab;
         while (ad) {
@@ -102,12 +115,12 @@ void imprimeLista(GRAFO *gr) {
     cout << "----------------------------------------------" << endl;
 }
 
-void freeLista(GRAFO *g) {
-    for(int i = 0; i < g->vertices; i++) {
-        free(g->adj[i].cab);
+void deleteLista(GRAFO *g) {
+    for(int i = 0; i < g->nVertices; i++) {
+        delete(g->adj[i].cab);
     }
-    free(g->adj);
-    free(g);
+    delete(g->adj);
+    delete(g);
 }
 
 void criaListAdj(GRAFO *gr, int** m){
@@ -228,7 +241,7 @@ int main(int argc, char**argv) {
     criaListAdj(gr, m);
     imprimeLista(gr);
     imprimeMatriz(m);
-    freeLista(gr);
+    deleteLista(gr);
     freeMatriz(m);
 
     return 0;
