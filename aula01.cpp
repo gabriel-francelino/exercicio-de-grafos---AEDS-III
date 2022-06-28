@@ -76,11 +76,11 @@ GRAFO *criaGrafo(int v) {
  * @return ADJACENCIA* 
  */
 ADJACENCIA *criaAdj(int v, int peso) {
-    ADJACENCIA *temp = (ADJACENCIA*) malloc(sizeof (ADJACENCIA));
-    temp->vertice = v;
-    temp->peso = peso;
-    temp->prox = NULL;
-    return temp;
+    ADJACENCIA *adj = new ADJACENCIA;
+    adj->vertice = v;
+    adj->peso = peso;
+    adj->prox = NULL;
+    return adj;
 }
 
 void criaAresta(GRAFO *gr, int vi, int vf, TIPOPESO p) { //vai de vi a vf
