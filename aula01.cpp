@@ -2,26 +2,20 @@
 #include <iostream>
 #include <math.h>
 
-
-#define infinito 10000000
-
 using namespace std;
 
-int nLinhas = 0, i = 0, j = 0;
+int nLinhas = 0;
 int *x; 
 int *y;
 
-
 //--------------------------------------------------LISTA DE ADJACENCIA--------------------------------------------------------
-typedef int TIPOPESO;
-
 /**
  * @brief estrutura para a lista de adjacencia.
  * 
  */
 typedef struct adjacencia {
     int vertice; //vertice de destino
-    TIPOPESO peso; //peso associado a aresta que leva ao vertice de destino
+    int peso; //peso associado a aresta que leva ao vertice de destino
     struct adjacencia *prox; //prox elemento da lista de adjacencia
 } ADJACENCIA;
 
@@ -43,13 +37,6 @@ typedef struct grafo {
     VERTICE *adj; //arranjo de vertices da estrutura
 } GRAFO;
 
-//teste-----------------------------------------
-typedef struct aresta
-{
-    int v1, v2;     //vertices da aresta
-    int peso;       //peso da aresta
-}ARESTA;
-
 /**
  * @brief função para criar um GRAFO
  * 
@@ -62,7 +49,7 @@ GRAFO *criaGrafo(int v) {
     g->nArestas = 0;
     g->adj = new VERTICE[v];
 
-    for (i = 0; i < v; i++) {
+    for (int i = 0; i < v; i++) {
         g->adj[i].cab = NULL;
     }
     return g;
@@ -83,32 +70,33 @@ ADJACENCIA *criaAdj(int v, int peso) {
     return adj;
 }
 
-void criaAresta(GRAFO *gr, int vi, int vf, TIPOPESO p) { //vai de vi a vf
-    //if (!gr) return (false); //validações se o grafo existe 
+void criaAresta(GRAFO *gr, int vi, int vf, int p) { //vai de vi a vf
+    ADJACENCIA *novo = criaAdj(vf, p);      //crio adjacencia com o vértice final e o peso
+                                            //coloco a adjacencia na lista do vértice inicial
+    novo->prox = gr->adj[vi].cab;           //o campo prox da adjacencia vai receber a cabeça da lista
+    gr->adj[vi].cab = novo;                 //e a cabeça da lista passa a ser o novo elemento
+    gr->nArestas++;                         // atualizo o numero de aresta no grafo
+}
 
-    //crio adjacencia com o vértice final e o peso
-    ADJACENCIA *novo = criaAdj(vf, p); 
-
-    //coloco a adjacencia na lista do vértice inicial
-    //o campo prox da adjacencia vai receber a cabeça da lista
-    novo->prox = gr->adj[vi].cab; 
-    // e a cabeça da lista passa a ser o novo elemento
-    gr->adj[vi].cab = novo; 
-    // atualizo o numero de aresta no grafo
-    gr->nArestas++; 
-    
-    //return (true);
+void criaListAdj(GRAFO *gr, int** m){
+    for (int i = 0; i < nLinhas; i++) {
+        for (int j = 0; j < nLinhas; j++) {
+            if (i != j) {
+                criaAresta(gr, i, j, m[i][j]);
+            }
+        }
+    }
 }
 
 void imprimeLista(GRAFO *gr) {
     cout << "---------------LISTA DE ADJACENCIA-------------" << endl;
     cout << "Vertices: " << gr->nVertices << "\tArestas: " << gr->nArestas << endl;
-    for (i = 0; i < gr->nVertices; i++) {
+    for (int i = 0; i < gr->nVertices; i++) {
         cout << "v" << i << ": ";
-        ADJACENCIA *ad = gr->adj[i].cab;
-        while (ad) {
-            cout << " -->  v" << ad->vertice << "(" << ad->peso << ")";
-            ad = ad->prox;
+        ADJACENCIA *adj = gr->adj[i].cab;
+        while (adj) {
+            cout << " -->  v" << adj->vertice << "(" << adj->peso << ")";
+            adj = adj->prox;
         }
         cout << endl;
     }
@@ -123,18 +111,9 @@ void deleteLista(GRAFO *g) {
     delete(g);
 }
 
-void criaListAdj(GRAFO *gr, int** m){
-    for (i = 0; i < nLinhas; i++) {
-        for (j = 0; j < nLinhas; j++) {
-            if (i != j) {
-                criaAresta(gr, i, j, m[i][j]);
-            }
-        }
-    }
-}
 //--------------------------------------------------MATRIZ DE ADJACENCIA-------------------------------------------------------
 
-void leGrafo(const char *name) {
+void numVerticesGrafo(const char *name) {
     ifstream myfile(name);
     if (myfile.is_open()) {
         while (!myfile.eof()) {
@@ -155,7 +134,7 @@ void leGrafo(const char *name) {
 int coordenadas(const char *name) {
     ifstream myfile(name);
     if (myfile.is_open()) {
-        i=0;
+        int i=0;
         while (!myfile.eof()) {
 
             int a;
@@ -173,18 +152,19 @@ int coordenadas(const char *name) {
     return 0;
 }
 
+void leCoordenadas(const char* name){
+    numVerticesGrafo(name);
+    coordenadas(name);
+}
+
 int peso(int *x, int *y, int i, int j) {
-    int p, a, b;
-    a = x[j] - x[i];
-    b = y[j] - y[i];
-    p = sqrt(pow(a, 2) + pow(b, 2));
-    return p;
+    return sqrt( pow((x[j] - x[i]), 2) + pow((y[j] - y[i]), 2));;
 }
 
 void imprimeMatriz(int **m) {
     cout << "-------------------------MATRIZ DE ADJACENCIA----------------------" << endl;
-    for (i = 0; i < nLinhas; i++) {
-        for (j = 0; j < nLinhas; j++) {
+    for (int i = 0; i < nLinhas; i++) {
+        for (int j = 0; j < nLinhas; j++) {
             cout << "|\t" << m[i][j] << "\t|";
         }
         cout << endl;
@@ -192,10 +172,10 @@ void imprimeMatriz(int **m) {
     cout << "-------------------------------------------------------------------" << endl;
 }
 
-int **matrizAloc() {
+int **matrizAdj() {
     int **mat;
     mat = new int*[nLinhas];
-    for (i = 0; i < nLinhas; i++) {
+    for (int i = 0; i < nLinhas; i++) {
         mat[i] = new int[nLinhas];
     }
 
@@ -207,13 +187,12 @@ int **matrizAloc() {
                 mat[lin][col] = peso(x, y, lin, col);
             }
         }
-
     }
     return mat;
 }
 
-void freeMatriz(int **m) {
-    for (i = 0; i < nLinhas; i++) {
+void deleteMatriz(int **m) {
+    for (int i = 0; i < nLinhas; i++) {
         delete(m[i]);
     }
     delete(m);
@@ -232,17 +211,16 @@ void freeMatriz(int **m) {
 //-------------------------------------------------------------------------------------------------------------------------------
 
 int main(int argc, char**argv) {
-    leGrafo("teste.txt");
-    coordenadas("teste.txt");
+    leCoordenadas("teste.txt");
 
-    int **m = matrizAloc();
+    int **m = matrizAdj();
     GRAFO *gr = criaGrafo(nLinhas);
 
     criaListAdj(gr, m);
     imprimeLista(gr);
     imprimeMatriz(m);
     deleteLista(gr);
-    freeMatriz(m);
+    deleteMatriz(m);
 
     return 0;
 }
